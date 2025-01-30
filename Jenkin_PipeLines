@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Delete workspace')
+		{
+			steps
+			{
+		    	cleanWs()
+			}
+		}
+        stage('Checkout') {
+            steps {
+                git branch: 'master',
+                url: 'https://github.com/testerintelligent/appInsurTestSeleniumAPI.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                bat 'mvn clean install'
+            }
+        }
+        stage('Run Test') {
+            steps {
+                bat 'mvn test'
+            }
+        }
+    }
+	post {
+		always{
+            cucumber 'target/json-report.json'  // Publish Cucumber JSON report
+            }
+		}
+ }
